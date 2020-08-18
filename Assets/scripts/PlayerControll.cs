@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerControll : MonoBehaviour
 {
@@ -23,6 +24,8 @@ public class PlayerControll : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
+
+      transform.Rotate(new Vector3(90,0,0)*Time.deltaTime);        
 
       int newLane = -1;
       // keyboard
@@ -64,5 +67,14 @@ public class PlayerControll : MonoBehaviour
       }
 
       scenario.transform.Translate(0,0, speedScenario * Time.deltaTime * -1);
+    }
+
+    void OnCollisionEnter(Collision col) {
+      if (col.gameObject.CompareTag("coin")) {
+        Destroy(col.gameObject);
+      } 
+      if (col.gameObject.CompareTag("obstacle")) {
+        SceneManager.LoadScene("GameOver", LoadSceneMode.Single);
+      }
     }
 }
