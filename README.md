@@ -1,1 +1,1 @@
-# unity-infinit-runner
+# unity-infinity-run
