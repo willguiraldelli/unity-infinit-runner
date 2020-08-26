@@ -15,6 +15,7 @@ public class PlayerControll : MonoBehaviour
   private Vector3 target;
   private Vector2 initalPosition;
 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -24,8 +25,7 @@ public class PlayerControll : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
-
-      transform.Rotate(new Vector3(90,0,0)*Time.deltaTime);        
+   
 
       int newLane = -1;
       // keyboard
@@ -69,12 +69,27 @@ public class PlayerControll : MonoBehaviour
       scenario.transform.Translate(0,0, speedScenario * Time.deltaTime * -1);
     }
 
+    /*
     void OnCollisionEnter(Collision col) {
+        Debug.Log(col.gameObject.tag);
       if (col.gameObject.CompareTag("coin")) {
         Destroy(col.gameObject);
       } 
       if (col.gameObject.CompareTag("obstacle")) {
         SceneManager.LoadScene("GameOver", LoadSceneMode.Single);
       }
+    }
+    */
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("coin"))
+        {
+            Destroy(other.gameObject);
+        }
+        if (other.gameObject.CompareTag("obstacle"))
+        {
+            SceneManager.LoadScene("GameOver", LoadSceneMode.Single);
+        }
     }
 }

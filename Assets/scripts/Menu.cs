@@ -12,4 +12,9 @@ public class Menu : MonoBehaviour
     public void openMenu() {
      SceneManager.LoadScene("Menu", LoadSceneMode.Single);
    }
+
+    public void openGameOver()
+    {
+        SceneManager.LoadScene("GameOver", LoadSceneMode.Single);
+    }
 }
