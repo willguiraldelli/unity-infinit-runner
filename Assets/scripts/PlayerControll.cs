@@ -15,12 +15,17 @@ public class PlayerControll : MonoBehaviour
   private Vector3 target;
   private Vector2 initalPosition;
 
+  public GameObject floor;
+  public GameObject obstacle;
+  public GameObject coin;
 
+  private int currentStage = 1;
     // Start is called before the first frame update
     void Start()
     {
      currentLane = 1;   
      target = player.transform.position;
+        buildScenario();
     }
 
     // Update is called once per frame
@@ -67,8 +72,66 @@ public class PlayerControll : MonoBehaviour
       }
 
       scenario.transform.Translate(0,0, speedScenario * Time.deltaTime * -1);
+
+        float scenarioZ = scenario.transform.position.z;
+        int stage = (int)(Mathf.Floor((scenarioZ - 80.0F) / -100.0F) + 1);
+        if(stage > currentStage)        {
+            GameObject floor2 = Instantiate(floor);
+            float posz = ((100 * currentStage) + 15) + scenarioZ;
+            float posx = floor.transform.position.x;
+            float posy = floor.transform.position.y;
+
+            floor2.transform.SetParent(scenario.transform);
+            floor2.transform.position = new Vector3(posx, posy, posz);
+            currentStage++;
+
+            buildScenario();
+        }
     }
 
+    void buildScenario(){
+        int start = 0;
+
+        if (currentStage == 1){
+            start = 2;
+        }
+
+        for (int i=start; i < 7; i++){
+            int[] element = new int[3];
+
+            for (int j=0; j < 3; j++){
+                element[j] = Random.Range(0, 3);
+
+                if (element[0] == 1 && element[1] == 1 && element[2] == 1){
+                    element[2] = 0;
+                }
+
+                if (element[j] == 1){
+                    instantiateObstacle(i, j);
+                }
+                else if (element[j] == 2){
+                    instantiateCoin(i, j);
+                }
+            }
+        }
+    }
+
+    void instantiateObstacle(int indexZ, int indexX){
+        GameObject obstacle2 = Instantiate(obstacle);
+        float posZ = ((14.28F * indexZ)+ ((currentStage - 1) * 100) + scenario.transform.position.z) - 20;
+        float posX = (indexX - 1) * laneDistance;
+        obstacle2.transform.SetParent(scenario.transform);
+        obstacle2.transform.position = new Vector3(posX, 0.5F, posZ);
+    }
+
+    void instantiateCoin(int indexZ, int indexX)
+    {
+        GameObject coin2 = Instantiate(coin);
+        float posZ = ((14.28F * indexZ) + ((currentStage - 1) * 100) + scenario.transform.position.z) - 20;
+        float posX = (indexX - 1) * laneDistance;
+        coin2.transform.SetParent(scenario.transform);
+        coin2.transform.position = new Vector3(posX, 0.5F, posZ);
+    }
     /*
     void OnCollisionEnter(Collision col) {
         Debug.Log(col.gameObject.tag);
