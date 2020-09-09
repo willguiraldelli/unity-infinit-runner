@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PlayerControll : MonoBehaviour
 {
@@ -19,18 +20,30 @@ public class PlayerControll : MonoBehaviour
   public GameObject obstacle;
   public GameObject coin;
 
+  private AudioSource coinSound;
+  private AudioSource explosionSound;
+  private bool isGameOver = false;
+
+  public Text gameoverText;
+
   private int currentStage = 1;
     // Start is called before the first frame update
     void Start()
     {
-     currentLane = 1;   
+
+        coinSound = GetComponents<AudioSource>()[0];
+        explosionSound = GetComponents<AudioSource>()[1];
+        currentLane = 1;   
      target = player.transform.position;
         buildScenario();
     }
 
     // Update is called once per frame
     void Update() {
-   
+
+        if(isGameOver){
+            return;
+        }
 
       int newLane = -1;
       // keyboard
@@ -148,11 +161,22 @@ public class PlayerControll : MonoBehaviour
     {
         if (other.gameObject.CompareTag("coin"))
         {
+            coinSound.Play();
             Destroy(other.gameObject);
         }
         if (other.gameObject.CompareTag("obstacle"))
         {
-            SceneManager.LoadScene("GameOver", LoadSceneMode.Single);
+            gameoverText.text = "GAME OVER";
+            isGameOver = true;
+            explosionSound.Play();
+            Invoke("GameOver", 2);
         }
     }
+
+    void GameOver()
+    {
+        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+
+    }
 }
+
