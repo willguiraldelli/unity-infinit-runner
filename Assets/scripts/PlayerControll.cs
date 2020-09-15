@@ -24,6 +24,9 @@ public class PlayerControll : MonoBehaviour
   private AudioSource explosionSound;
   private bool isGameOver = false;
 
+  public Text txtPoints;
+  private int points = 0;
+
   public Text gameoverText;
 
   private int currentStage = 1;
@@ -34,8 +37,9 @@ public class PlayerControll : MonoBehaviour
         coinSound = GetComponents<AudioSource>()[0];
         explosionSound = GetComponents<AudioSource>()[1];
         currentLane = 1;   
-     target = player.transform.position;
+        target = player.transform.position;
         buildScenario();
+        txtPoints.text = ""+points;
     }
 
     // Update is called once per frame
@@ -46,12 +50,17 @@ public class PlayerControll : MonoBehaviour
         }
 
       int newLane = -1;
+      bool jump = false;
+
       // keyboard
       if(Input.GetKeyDown(KeyCode.RightArrow) && currentLane < 2) {
         newLane = currentLane + 1;
       } else if (Input.GetKeyDown(KeyCode.LeftArrow) && currentLane > 0) {
         newLane = currentLane - 1;
       }
+      if (Input.GetKeyDown(KeyCode.Space)){
+            jump = true;
+        };
       
       // mouse
       if(Input.GetMouseButtonDown(0)) {
@@ -62,6 +71,9 @@ public class PlayerControll : MonoBehaviour
         } else if (Input.mousePosition.x < initalPosition.x && currentLane > 0) {
           newLane = currentLane - 1;
         }
+        if (Input.mousePosition.y > initalPosition.y){
+                jump = true;
+            };
       }
 
       // Touch
@@ -74,8 +86,12 @@ public class PlayerControll : MonoBehaviour
           } else if (Input.GetTouch(0).position.x < initalPosition.x && currentLane > 0) {
             newLane = currentLane - 1;
           }
+          if (Input.GetTouch(0).position.y > initalPosition.y){
+            jump = true;
+           }
         }
-      } 
+      }
+
       if (newLane>= 0){
         currentLane = newLane;
         target = new Vector3((currentLane - 1) * laneDistance, player.transform.position.y, player.transform.position.z);
@@ -84,6 +100,22 @@ public class PlayerControll : MonoBehaviour
         player.transform.position = Vector3.Lerp(player.transform.position, target, 5*Time.deltaTime);
       }
 
+
+      if(jump){
+            if (player.transform.position.x < 2.5) {
+                target.y = 3.0F;
+                player.transform.position = Vector3.Lerp(player.transform.position, target, 5 * Time.deltaTime);
+            } else {
+                jump = false;
+            };
+        } else if (jump == false && player.transform.position.y > 0.5) {
+            target.y = 0.5F;
+            player.transform.position = Vector3.Lerp(player.transform.position, target, 5 * Time.deltaTime);
+        } else if (player.transform.position.x != target.x) {
+            player.transform.position = Vector3.Lerp(player.transform.position, target, 5 * Time.deltaTime);
+        }
+
+        speedScenario += (Time.deltaTime * 0.1F);
       scenario.transform.Translate(0,0, speedScenario * Time.deltaTime * -1);
 
         float scenarioZ = scenario.transform.position.z;
@@ -163,6 +195,8 @@ public class PlayerControll : MonoBehaviour
         {
             coinSound.Play();
             Destroy(other.gameObject);
+            points++;
+            txtPoints.text = "" + points;
         }
         if (other.gameObject.CompareTag("obstacle"))
         {
