@@ -20,9 +20,14 @@ public class PlayerControll : MonoBehaviour
   public GameObject obstacle;
   public GameObject coin;
 
+  private AudioSource scenarioSound;
   private AudioSource coinSound;
   private AudioSource explosionSound;
+  private AudioSource diamondSound;
+
   private bool isGameOver = false;
+  private bool isDiamond = false;
+  private bool jump = false;
 
   public Text txtPoints;
   private int points = 0;
@@ -36,6 +41,11 @@ public class PlayerControll : MonoBehaviour
 
         coinSound = GetComponents<AudioSource>()[0];
         explosionSound = GetComponents<AudioSource>()[1];
+        scenarioSound = GetComponents<AudioSource>()[2];
+        diamondSound = GetComponents<AudioSource>()[3];
+
+        scenarioSound.Play();
+
         currentLane = 1;   
         target = player.transform.position;
         buildScenario();
@@ -50,7 +60,6 @@ public class PlayerControll : MonoBehaviour
         }
 
       int newLane = -1;
-      bool jump = false;
 
       // keyboard
       if(Input.GetKeyDown(KeyCode.RightArrow) && currentLane < 2) {
@@ -102,7 +111,7 @@ public class PlayerControll : MonoBehaviour
 
 
       if(jump){
-            if (player.transform.position.x < 2.5) {
+            if (player.transform.position.y < 2.5F) {
                 target.y = 3.0F;
                 player.transform.position = Vector3.Lerp(player.transform.position, target, 5 * Time.deltaTime);
             } else {
@@ -151,8 +160,13 @@ public class PlayerControll : MonoBehaviour
                     element[2] = 0;
                 }
 
-                if (element[j] == 1){
+                if (element[j] == 1 && !isDiamond){
                     instantiateObstacle(i, j);
+                }
+
+                if (element[j] == 1 && isDiamond)
+                {
+                    instantiateCoin(i, j);
                 }
                 else if (element[j] == 2){
                     instantiateCoin(i, j);
@@ -204,6 +218,16 @@ public class PlayerControll : MonoBehaviour
             isGameOver = true;
             explosionSound.Play();
             Invoke("GameOver", 2);
+        }
+        if (other.gameObject.CompareTag("diamond"))
+        {
+            isDiamond = true;
+            scenarioSound.Pause();
+            diamondSound.Play();
+        }
+        if (other.gameObject.CompareTag("spring"))
+        {
+            jump = true;
         }
     }
 
